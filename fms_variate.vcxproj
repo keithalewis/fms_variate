@@ -144,11 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fms_variate.cpp" />
+    <ClCompile Include="fms_variate_constant.t.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NOTES.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fms_variate_constant.h" />
     <ClInclude Include="fms_variate_normal.h" />
     <ClInclude Include="fms_variate.h" />
   </ItemGroup>

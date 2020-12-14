@@ -2,65 +2,40 @@
 #include <cassert>
 #include <limits>
 #include "fms_variate.h"
+#include "fms_variate_constant.h"
+#include "fms_variate_normal.h"
 
+using namespace fms;
 using namespace fms::variate;
 
-// constant random variable
-template<class X, class S = X>
-class constant {
-	X c;
-public:
-	typedef typename X xtype;
-	typedef typename S stype;
-
-	constant(X c)
-		: c(c)
-	{ }
-
-	X cdf(X x, S s, size_t n) const
-	{
-		if (n == 0) {
-			return 1 * (c <= x);
-		}
-		if (n == 1) {
-			return x == c ? std::numeric_limits<X>::infinity() : 0;
-		}
-
-		return std::numeric_limits<X>::quiet_NaN();
-	}
-	S cumulant(S s, size_t n) const
-	{
-		if (n == 0) {
-			return c * s;
-		}
-		if (n == 1) {
-			return c;
-		}
-
-		return 0;
-	}
-	X sega(X, S) const
-	{
-		return 0;
-	}
-};
-
-template<class X, class S = X>
-int test_constant(X x)
+// generic variate tests
+template<variate_concept M>
+int test_variate(const M& m)
 {
 	{
-		constant one(x);
-
-		assert(mean(one) == x);
-		assert(variance(one) == 0);
-		assert(cdf(one, x - 1) == 0);
-		assert(cdf(one, x + 1) == 1);
-		assert(cdf(one, x) == 1);
+		assert(m.cumulant(0) == 0);
+		assert(m.cdf(0) == cdf(m, 0.));
 	}
 
 	return 0;
 }
-int test_constant_d = test_constant<double>(1);
+int test_variate_constant = test_variate(constant(1.23));
+int test_variate_normal = test_variate(standard_normal<double>{});
+
+template<variate_concept M>
+int test_standard_variate(const M& m)
+{
+	{
+		assert(mean(m) == 0);
+		assert(variance(m) == 1);
+		assert(m.cumulant(0, 0) == 0);
+		assert(m.cumulant(0, 1) == 0);
+		assert(m.cumulant(0, 2) == 1);
+	}
+
+	return 0;
+}
+int test_standard_variate_normal = test_variate(standard_normal<double>{});
 
 int main()
 {

@@ -1,7 +1,6 @@
 // fms_variate_normal.h - normal distribution
 #pragma once
 #include <cmath>
-#include "fms_variate.h"
 
 namespace fms::variate {
 
@@ -15,7 +14,7 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
-		static X cdf(X x, S s, size_t n = 0)
+		static X cdf(X x, S s = 0, size_t n = 0)
 		{
 			X x_ = x - s;
 
@@ -34,7 +33,7 @@ namespace fms::variate {
 		}
 
 		// (d/ds) cdf(x, s, 0)
-		static X sega(X x, S s)
+		static X edf(X x, S s)
 		{
 			return -cdf(x, s, 1);
 		}
