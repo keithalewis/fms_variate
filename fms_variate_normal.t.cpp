@@ -22,7 +22,7 @@ inline void check(X df, X f1, X h)
 	X y;
 	y = err / rem;
 
-	assert(fabs(df - f1) < 20 * h * h);
+	assert(fabs(df - f1) < 40 * h * h);
 }
 
 template<class X>
@@ -61,7 +61,7 @@ int test_variate_normal()
 	{
 		standard_normal<X> n;
 
-		for (size_t k : {0, 1, 2}) {
+		for (size_t k : {0, 1, 2, 3}) {
 			for (X x : range<X>(-2, 3, 1)) {
 				for (X s : range(X(-0.1), X(0.2), X(0.1))) {
 					for (X h : range<X>(2, 4, 1)) {
