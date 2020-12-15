@@ -29,6 +29,9 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
+		standard_normal()
+		{ }
+
 		static X cdf(X x, S s = 0, size_t n = 0)
 		{
 			X x_ = x - s;

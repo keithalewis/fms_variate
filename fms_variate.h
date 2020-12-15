@@ -32,7 +32,7 @@ namespace fms {
 			typedef S stype;
 
 			affine(const V& v, X mu = 0, X sigma = 1)
-				: v(v), mu(mu), sigma(sigma)
+				: v(v), mu(mu), sigma(sigma == 0 ? 1 : sigma)
 			{ }
 
 			X cdf(X x, S s = 0, size_t n = 0) const
@@ -47,7 +47,7 @@ namespace fms {
 
 			S edf(X x, S s) const
 			{
-				return sigma * v.edf((x - mu)/sigma, sigma * x);
+				return sigma * v.edf((x - mu)/sigma, sigma * s);
 			}
 		};
 
