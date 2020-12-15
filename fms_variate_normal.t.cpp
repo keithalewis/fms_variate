@@ -66,8 +66,12 @@ int test_variate_normal()
 				for (X s : range(X(-0.1), X(0.2), X(0.1))) {
 					for (X h : range<X>(2, 4, 1)) {
 						h = pow(X(10), -h);
+						
 						X df = diff([k, x, s, h, &n](X x) { return n.cdf(x, s, k); }, x, h);
 						check(df, n.cdf(x, s, k + 1), h);
+
+						X ds = diff([x, s, h, &n](X s) { return n.cdf(x, s); }, s, h);
+						check(ds, n.edf(x, s), h);
 					}
 				}
 			}
