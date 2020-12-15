@@ -4,6 +4,21 @@
 
 namespace fms::variate {
 
+	// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
+	template<class X>
+	inline constexpr X Hermite(size_t n, X x)
+	{
+		if (n == 0) {
+			return X(1);
+		}
+		if (n == 1) {
+			return x;
+		}
+
+		return x * Hermite(n - 1, x) - X(n - 1) * Hermite(n - 2, x);
+	}
+
+
 	// Normal mean 0 variance 1
 	template<class X = double, class S = X>
 	class standard_normal
@@ -29,7 +44,7 @@ namespace fms::variate {
 			}
 
 			// (d/dx)^n phi(x) = (-1)^n phi(x) H_n(x)
-			return phi * H(n - 1, x_) * (n % 2 == 0 ? 1 : -1);
+			return phi * Hermite(n - 1, x_) * ((n&1) ? 1 : -1);
 		}
 
 		// (d/ds) cdf(x, s, 0)
@@ -61,18 +76,5 @@ namespace fms::variate {
 			return s_ * s_ / 2;
 		}
 		*/
-	private:
-		// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
-		static constexpr X H(size_t n, X x)
-		{
-			if (n == 0) {
-				return X(1);
-			}
-			if (n == 1) {
-				return x;
-			}
-
-			return x * H(n - 1, x) - X(n - 1) * H(n - 2, x);
-		}
 	};
 }

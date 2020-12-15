@@ -1,6 +1,7 @@
-// fms_variate_constant.h - constant variate
+﻿// fms_variate_constant.h - constant variate
 #pragma once
 #include <cmath>
+#include <limits>
 
 namespace fms::variate {
 
@@ -16,18 +17,22 @@ namespace fms::variate {
 			: c(c)
 		{ }
 
+		// F_s(x) = 1(c <= x) independent of s
 		X cdf(X x, S s = 0, size_t n = 0) const
 		{
 			if (n == 0) {
 				return 1 * (c <= x);
 			}
 			if (n == 1) {
+				// really δ_c(x)
 				return x == c ? std::numeric_limits<X>::infinity() : 0;
 			}
 
+			// really δ_c^{(n - 1)}(x)
 			return std::numeric_limits<X>::quiet_NaN();
 		}
 
+		// κ(s) = cs
 		S cumulant(S s, size_t n = 0) const
 		{
 			if (n == 0) {
@@ -40,6 +45,7 @@ namespace fms::variate {
 			return 0;
 		}
 
+		// F_s(x) = 1(c <= x) does not depend on s
 		X edf(X, S) const
 		{
 			return 0;

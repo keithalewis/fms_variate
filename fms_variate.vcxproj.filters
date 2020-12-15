@@ -21,6 +21,9 @@
     <ClCompile Include="fms_variate_constant.t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fms_variate_normal.t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="NOTES.md" />

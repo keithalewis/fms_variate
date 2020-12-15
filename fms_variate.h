@@ -35,14 +35,14 @@ namespace fms {
 				: v(v), mu(mu), sigma(sigma)
 			{ }
 
-			X cdf(X x, S s, size_t n) const
+			X cdf(X x, S s = 0, size_t n = 0) const
 			{
-				return v.cdf((x - mu) / sigma, s, n) / pow(sigma, n);
+				return v.cdf((x - mu) / sigma, s, n) / pow(sigma, X(n));
 			}
 
-			S cumulant(S s, size_t n) const
+			S cumulant(S s, size_t n = 0) const
 			{
-				return cumulant(sigma * s, n) * pow(sigma, n) + (n == 0 ? mu * s : n == 1 ? mu : 0);
+				return v.cumulant(sigma * s, n) * pow(sigma, X(n)) + (n == 0 ? mu * s : n == 1 ? mu : 0);
 			}
 
 			S edf(X x, S s) const
