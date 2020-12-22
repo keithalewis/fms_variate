@@ -2,40 +2,12 @@
 
 #include <cassert>
 #include <vector>
+#include "fms_test.h"
 #include "fms_variate.h"
 #include "fms_variate_normal.h"
 
-using namespace fms;
+using namespace fms::test;
 using namespace fms::variate;
-// f'(x) + f'''(x)h^2/6 + ...
-template<class F, class X>
-inline X diff(const F& f, X x, X h)
-{
-	return (f(x + h) - f(x - h)) / (2 * h);
-}
-
-template<class X>
-inline void check(X df, X f1, X h)
-{
-	X err = fabs(df - f1);
-	X rem = h * h;
-	X y;
-	y = err / rem;
-
-	assert(fabs(df - f1) < 40 * h * h);
-}
-
-template<class X>
-inline std::vector<X> range(X a, X b, X h)
-{
-	std::vector<X> r;
-
-	for (X x = a; x < b; x += h) {
-		r.push_back(x);
-	}
-
-	return r;
-}
 
 template<class X>
 int test_hermite()
@@ -99,5 +71,5 @@ int test_variate_normal()
 	}
 	return 0;
 }
-int test_variate_normal_f = test_variate_normal<float>();
+//int test_variate_normal_f = test_variate_normal<float>();
 int test_variate_normal_d = test_variate_normal<double>();
