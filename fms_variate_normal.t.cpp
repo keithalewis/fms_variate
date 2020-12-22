@@ -33,22 +33,11 @@ int test_variate_normal()
 	{
 		standard_normal<X> n;
 
-		for (size_t k : {0, 1, 2, 3}) {
-			for (X x : range<X>(-2, 3, 1)) {
-				for (X s : range(X(-0.1), X(0.2), X(0.1))) {
-					for (X h : range<X>(2, 4, 1)) {
-						h = pow(X(10), -h);
-						
-						X df = diff([k, x, s, h, &n](X x) { return n.cdf(x, s, k); }, x, h);
-						check(df, n.cdf(x, s, k + 1), h);
-
-						X ds = diff([x, s, h, &n](X s) { return n.cdf(x, s); }, s, h);
-						check(ds, n.edf(x, s), h);
-					}
-				}
-			}
-		}
-
+		auto xs = range<X>(-2, 3, 1);
+		auto ss = range(X(-0.1), X(0.2), X(0.1));
+		auto ns = std::vector<size_t>({ 0,1,2,3 });
+		
+		check_range(n, xs, ss, ns, 1e-4);
 	}
 	{
 		standard_normal<X> n;
