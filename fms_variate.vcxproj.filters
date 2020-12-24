@@ -51,5 +51,8 @@
     <ClInclude Include="fms_ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fms_hypergeometric.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

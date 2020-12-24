@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fms_ensure.h" />
+    <ClInclude Include="fms_hypergeometric.h" />
     <ClInclude Include="fms_test.h" />
     <ClInclude Include="fms_variate_constant.h" />
     <ClInclude Include="fms_variate_logistic.h" />

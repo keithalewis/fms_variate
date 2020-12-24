@@ -1,10 +1,13 @@
 // fms_variate_logistic
 #pragma once
 #include <concepts>
+#include <initializer_list>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_psi.h>
+#include <gsl/gsl_sf_hyperg.h>
 #include "fms_ensure.h"
+#include "fms_hypergeometric.h"
 
 namespace fms::variate {
 
@@ -46,20 +49,20 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
+		// (d/dx)^n 1/(1 + e^{-x} = sum_{k=1}^n A_{n,k} e^{-k x}/(1 + e^{-x})^{k + 1}
 		static X cdf0(X x, size_t n = 0)
 		{
 			X e = exp(-x);
-			X e1 = 1 / (1 + e);
 
 			if (n == 0) {
-				return e1;
+				return 1/(1 + e);
 			}
 
 			X f = 0;
 			X e_ = e;
-			X e1_ = e1;
+			X e1_ = 1 + e;
 			for (size_t k = 1; k <= n; ++k) {
-				e1_ *= e1;
+				e1_ *= 1 + e;
 				f += A(n, k) * e_ / e1_;
 				e_ *= e;
 			}
@@ -103,7 +106,24 @@ namespace fms::variate {
 		}
 		static X edf(X x, S s)
 		{
-			return x + s;
+			X u = cdf0(x, 0);
+
+			return
+
+			-((pow(u, 1 + s) * pow(gsl_sf_gamma(1 + s), 2) *
+				(gsl_sf_hyperg_2F1(s, 1 + s, 2 + s, u) /
+					gsl_sf_gamma(1 + s) - 
+					s * HypergeometricPFQ({ 1 + s, 1 + s, 1 + s }, { 2 + s, 2 + s }, u, true))) / gsl_sf_beta(1 + s, 1 - s)) -
+				(pow(1 - u, 1 - s) * pow(gsl_sf_gamma(1 - s), 2) *
+					(gsl_sf_hyperg_2F1(1 - s, -s, 2 - s, 1 - u) /
+						gsl_sf_gamma(1 - s) + s * HypergeometricPFQ({ 1 - s, 1 - s, 1 - s }, { 2 - s, 2 - s }, 1 - u, true)) +
+					gsl_sf_beta_inc(1 - s, 1 + s, 1 - u) * gsl_sf_beta(1 - s, 1 + s) * (-1 + M_EULER - log(1 - u) +
+						gsl_sf_psi(1 - s))) / gsl_sf_beta(1 + s, 1 - s) +
+				gsl_sf_beta_inc(1 + s, 1 - s, u) *
+				(1 - M_EULER + log(u) - gsl_sf_psi(1 + s))
+
+			;
+			
 		}
 	};
 
