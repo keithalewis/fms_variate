@@ -28,20 +28,25 @@ int test_variate_logistic()
 					X h = pow(0.1, i);
 					auto f = [n](X s) { return logistic<X>::cumulant(s, n); };
 					X df = diff(f, s, h);
-					X f1 = logistic<X>::cumulant(s, n + 1);
-					check(df, f1, h);
+					check(df, f, s, h);
 				}
 			}
 		}
 	}
 	{
-		logistic<X> n;
+		logistic<X> L;
 
-		auto xs = range<X>(-2, 1, 1);
+		auto xs = range<X>(-2, 3, 1);
 		auto ss = range(X(-0.1), X(0.2), X(0.1));
-		auto ns = std::valarray<size_t>({ 0,1,2,3 });
+		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
 
-		check_range(n, xs, ss, ns, 1e-4);
+		for (auto s : ss) {
+			for (auto n : { 0, 1, 2, 3 }) {
+				auto f = [s, n, &L](X x) { return L.cdf(x, s, n); };
+				auto df = [s, n, &L](X x) { return L.cdf(x, s, n + 1); };
+				check(f, df, xs, hs);
+			}
+		}
 	}
 
 

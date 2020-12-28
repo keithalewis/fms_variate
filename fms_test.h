@@ -15,14 +15,27 @@ namespace fms::test {
 	}
 
 	// error is O(h^2) where O ~ f'''/6
-	template<class X>
-	inline void check(X df, X f1, X h, X O = 150)
+	template<class F, class X>
+	inline void check(X df, const F& f, X x, X h, X O = 150)
 	{
+		X f1 = diff(f, x, h);
 		O = O * std::max({ X(1), abs(df), abs(f1) });
-		X r = fabs(df - f1) / (h * h);
-		X r_ = 1 / r;
+		X o = fabs(df - f1) / (h * h);
+		X o_ = 1 / o;
 
-		assert(fabs(df - f1) < O * h * h);
+		assert(fabs(df - f1) < O * (h * h));
+	}
+
+	// range of x and dx
+	template<class F, class dF, class Xs>
+	inline void check(const F& f, const dF& df, const Xs& xs, const Xs& hs)
+	{
+		for (auto x : xs) {
+			auto dfx = df(x);
+			for (auto h : hs) {
+				check(dfx, f, x, h);
+			}
+		}
 	}
 
 	// a, a + h, ... , b
@@ -36,20 +49,6 @@ namespace fms::test {
 		}
 
 		return r;
-	}
-
-	template<class M, class Xs, class Ss, class Ns, class X>
-	inline void check_range(const M& m, const Xs& xs, const Ss& ss, const Ns& ns, X h) 
-	{
-		for (auto s : ss) {
-			for (auto n : ns) {
-				auto f = [m, s, n](X x) { return m.cdf(x, s, n); };
-				for (auto x : xs) {
-					X df = diff(f, x, h);
-					check(df, m.cdf(x, s, n + 1), h);
-				}
-			}
-		}
 	}
 
 }

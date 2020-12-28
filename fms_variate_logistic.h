@@ -81,16 +81,14 @@ namespace fms::variate {
 				return gsl_sf_beta_inc(1 + s, 1 - s, 1/(1 + exp(-x)));
 			}
 
-			X es = exp(s * x - cumulant(s, 0));
-
 			X f = 0;
 			S sk = 1; // s^k
 			for (size_t k = 0; k < n; ++k) {
-				f += C(n, k) * cdf0(x, k + 1) * sk;
+				f += gsl_sf_choose((unsigned int)n - 1, (unsigned int)k) * cdf0(x, n - k) * sk;
 				sk *= s;
 			}
 
-			return es * f;
+			return exp(s * x - cumulant(s, 0)) * f;
 		}
 		static S cumulant(S s, size_t n = 0)
 		{

@@ -31,13 +31,19 @@ int test_variate_normal()
 	//X dx = X(0.001);
 
 	{
-		standard_normal<X> n;
+		standard_normal<X> N;
 
 		auto xs = range<X>(-2, 3, 1);
 		auto ss = range(X(-0.1), X(0.2), X(0.1));
-		auto ns = std::vector<size_t>({ 0,1,2,3 });
-		
-		check_range(n, xs, ss, ns, 1e-4);
+		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
+
+		for (auto s : ss) {
+			for (auto n : { 0, 1, 2, 3 }) {
+				auto f = [s, n, &N](X x) { return N.cdf(x, s, n); };
+				auto df = [s, n, &N](X x) { return N.cdf(x, s, n + 1); };
+				check(f, df, xs, hs);
+			}
+		}
 	}
 	{
 		standard_normal<X> n;
