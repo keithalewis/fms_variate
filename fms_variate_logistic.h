@@ -78,7 +78,7 @@ namespace fms::variate {
 			}
 
 			if (n == 0) {
-				return gsl_sf_beta_inc(1 + s, 1 - s, 1/(1 + exp(-x)));
+				return beta_inc(1 + s, 1 - s, 1/(1 + exp(-x)));
 			}
 
 			X f = 0;
@@ -100,28 +100,34 @@ namespace fms::variate {
 
 			int n_ = static_cast<int>(n - 1);
 
-			return gsl_sf_psi_n(n_, 1 + s) + (n_&1 ? 1 : -1)*gsl_sf_psi_n(n_, 1 - s);
+			return gsl_sf_psi_n(n_, 1 + s) + ((n_&1) ? 1 : -1) * gsl_sf_psi_n(n_, 1 - s);
 		}
 		static X edf(X x, S s)
 		{
 			X u = cdf0(x, 0);
 
-			return
+			return beta_inc_1(1 + s, 1 - s, u) - beta_inc_2(1 + s, 1 - s, u);
+		}
 
-			-((pow(u, 1 + s) * pow(gsl_sf_gamma(1 + s), 2) *
-				(gsl_sf_hyperg_2F1(s, 1 + s, 2 + s, u) /
-					gsl_sf_gamma(1 + s) - 
-					s * HypergeometricPFQ({ 1 + s, 1 + s, 1 + s }, { 2 + s, 2 + s }, u, true))) / gsl_sf_beta(1 + s, 1 - s)) -
-				(pow(1 - u, 1 - s) * pow(gsl_sf_gamma(1 - s), 2) *
-					(gsl_sf_hyperg_2F1(1 - s, -s, 2 - s, 1 - u) /
-						gsl_sf_gamma(1 - s) + s * HypergeometricPFQ({ 1 - s, 1 - s, 1 - s }, { 2 - s, 2 - s }, 1 - u, true)) +
-					gsl_sf_beta_inc(1 - s, 1 + s, 1 - u) * gsl_sf_beta(1 - s, 1 + s) * (-1 + M_EULER - log(1 - u) +
-						gsl_sf_psi(1 - s))) / gsl_sf_beta(1 + s, 1 - s) +
-				gsl_sf_beta_inc(1 + s, 1 - s, u) *
-				(1 - M_EULER + log(u) - gsl_sf_psi(1 + s))
+		static X beta_inc(X a, X b, X u)
+		{
+			return gsl_sf_beta_inc(a, b, u);
+		}
 
-			;
-			
+		// d/da I_u(a, b) = (log u - psi(a) + psi(a + b)) I_u(a,b)
+		static X beta_inc_1(X a, X b, X u)
+		{
+			X Iu = beta_inc(a, b, u);
+
+			return (log(u) - gsl_sf_psi_n(0, a) + gsl_sf_psi_n(0, a + b)) * Iu;
+		}
+		// I_u(a, b) = 1 - I_{1 - u}(b, a)
+		// d/db I_u(a, b) = d/db 1 - I_{1 - u}(b, a)
+		static X beta_inc_2(X a, X b, X u)
+		{
+			X Iu_ = beta_inc(b, a, 1 - u);
+
+			return -(log(1 - u) - gsl_sf_psi_n(0, b) + gsl_sf_psi_n(0, b + a)) * Iu_;
 		}
 	};
 
