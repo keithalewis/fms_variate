@@ -7,7 +7,7 @@
 #include <gsl/gsl_sf_psi.h>
 #include <gsl/gsl_sf_hyperg.h>
 #include "fms_ensure.h"
-#include "fms_hypergeometric.h"
+#include "fms_sf_hypergeometric.h"
 
 namespace fms::variate {
 
