@@ -29,8 +29,10 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
+		/*
 		standard_normal()
 		{ }
+		*/
 
 		static X cdf(X x, S s = 0, size_t n = 0)
 		{
@@ -70,11 +72,12 @@ namespace fms::variate {
 
 			return S(0);
 		}
+		
 		/*
 		template<size_t N>
 		static S cumulant(S s)
 		{
-			epsilon<N, S> s_(s);
+			epsilon<S,N> s_(s);
 
 			return s_ * s_ / 2;
 		}
