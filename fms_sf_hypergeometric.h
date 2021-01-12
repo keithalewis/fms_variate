@@ -92,13 +92,14 @@ namespace fms::sf {
 
 	// pFq(a,b,x) = sum_n (a_1)_n ... (a_p)_n/((b_1)_n ... (b_q)_n) x^n/n!
 	template<class X> requires std::is_floating_point_v<X>
-	static X HypergeometricPFQ(const list<X>& a, const list<X>& b, X x, bool regularized = false)
+	static X HypergeometricPFQ(const list<X>& a, const list<X>& b, X x, bool regularized = false,
+		X eps = sqrt_eps, int skip = 40, int terms = 40)
 	{
-		Hypergeometric pFq(a, b);
+		Hypergeometric pFq(a, b, eps, skip, terms);
 
-		X F = pFq.value(x);
+		auto F = pFq.value(x);
 
-		return regularized ? pFq.regularized() : F;
+		return regularized ? pFq.regularized() : std::get<0>(F);
 	}
 
 }

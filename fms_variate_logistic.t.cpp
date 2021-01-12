@@ -7,8 +7,32 @@ using namespace fms::test;
 using namespace fms::variate;
 
 template<class X>
+int test_variate_logistic_A()
+{
+	for (auto a : { (X)0.9, (X)1.0, (X)1.1 }) {
+		for (auto b : { (X)0.9, (X)1.0, (X)1.1 }) {
+			check_A(a, b);
+		}
+	}
+	return 0;
+}
+int test_variate_logistic_A_d = test_variate_logistic_A<double>();
+
+template<class X>
 int test_variate_logistic()
 {
+	{
+		logistic<X> v;
+		X s = 0.1;
+		X x = -2;
+		X h = 0.01;
+		X f1, df;
+		f1 = v.cdf(x, s, 2);
+		X dp = v.cdf(x + h, s, 1);
+		X dm = v.cdf(x - h, s, 1);
+		df = (dp - dm) / (2 * h);
+		df -= f1;
+	}
 	{
 		logistic<X> v;
 
@@ -26,7 +50,7 @@ int test_variate_logistic()
 	{
 		logistic<X> v;
 
-		for (size_t n = 0; n < 4; ++n) {
+		for (unsigned n = 0; n < 4; ++n) {
 			for (X s : range(-0.5, 0.5, 0.1)) {
 				for (int i : range(2, 5, 1)) {
 					X h = pow(0.1, i);

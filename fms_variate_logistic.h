@@ -44,7 +44,7 @@ namespace fms::variate {
 
 		// A_{n,k} = (k - 1 + a + b) A_{n-1, k-1} - (k + b) A_{n-1, k}
 		template<class X = double>
-		inline X A(X a, X b, size_t n, size_t k)
+		inline X A(X a, X b, unsigned n, unsigned k)
 		{
 			if (n == 0) {
 				return k == 0;
@@ -60,6 +60,21 @@ namespace fms::variate {
 		}
 	}
 
+#ifdef _DEBUG
+	template<class X>
+	inline void check_A(X a, X b) 
+	{
+		assert(A(a, b, 0, 0) == 1);
+		assert(A(a, b, 0, 1) == 0);
+		assert(A(a, b, 0, -1) == 0);
+
+		assert(A(a, b, 1, 0) == -b);
+		assert(A(a, b, 1, 1) == a + b);
+		assert(A(a, b, 1, 2) == 0);
+		assert(A(a, b, 1, -1) == 0);
+	}
+#endif // _DEBUT
+
 	// generalized logistic f(a,b;x) = e^{-a x}/(1 + e^{-x})^{a + b} / B(a,b)
 	template<class X = double, class S = X>
 		requires std::is_floating_point_v<X> && std::is_floating_point_v<S>
@@ -74,7 +89,7 @@ namespace fms::variate {
 		// (d/dx)^n 1/(1 + e^{-x}) = sum_{k=1}^n A_{n,k} e^{-k x}/(1 + e^{-x})^{k + 1}
 		// (d/dx)^n f(x) = sum_{k=0}^n A_{n,k} e^{-(k + b) x}/(1 + e^{-x})^{k + a + b}
 		//               = e^{-b x}/(1 + e^{-x})^{a + b} sum_{k=0}^n A_{n,k} 1/(e^{-x} (1 + e^{-x}))^k
-		X cdf0(X x, size_t n = 0)
+		X cdf0(X x, unsigned n = 0)
 		{
 			ensure(a > 0 and b > 0);
 	
@@ -83,17 +98,17 @@ namespace fms::variate {
 			}
 
 			X Ak = 0;
-			X n_ = static_cast<X>(n - 1);
+			unsigned n_ = n - 1;
 			X e = exp(-x) * (1 + exp(-x));
 			X e_k = 1; // e^{-k}
-			for (size_t k = 0; k <= n_; ++k) {
+			for (unsigned k = 0; k <= n_; ++k) {
 				Ak += A(a, b, n_, k) * e_k;
 				e_k /= e;
 			}
 
 			return exp(-b * x) * pow(1 + exp(-x), -a - b) * Ak / Bab;
 		}
-		X cdf(X x, S s = 0, size_t n = 0)
+		X cdf(X x, S s = 0, unsigned n = 0)
 		{
 			ensure(-a < s and s < b);
 
@@ -107,14 +122,14 @@ namespace fms::variate {
 
 			X f = 0;
 			S sk = 1; // s^k
-			for (size_t k = 0; k < n; ++k) {
+			for (unsigned k = 0; k < n; ++k) {
 				f += gsl_sf_choose((unsigned int)n - 1, (unsigned int)k) * cdf0(x, n - k) * sk;
 				sk *= s;
 			}
 
 			return exp(s * x - cumulant(s, 0)) * f;
 		}
-		S cumulant(S s, size_t n = 0)
+		S cumulant(S s, unsigned n = 0)
 		{
 			ensure(-1 < s and s < 1);
 
