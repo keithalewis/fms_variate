@@ -41,6 +41,23 @@ namespace fms::variate {
 
 			return (n == 0 or k > n) ? 0 : C(n - 1, k) + C(n - 1, k - 1);
 		}
+
+		// A_{n,k} = (k - 1 + a + b) A_{n-1, k-1} - (k + b) A_{n-1, k}
+		template<class X = double>
+		inline X A(X a, X b, size_t n, size_t k)
+		{
+			if (n == 0) {
+				return k == 0;
+			}
+			if (k == 0) {
+				return -(k + b) * A(a, b, n - 1, 0);
+			}
+			if (k == n) {
+				return (k - 1 + a + b) * A(a, b, n - 1, n - 1);
+			}
+
+			return (k - 1 + a + b) * A(a, b, n - 1, k - 1) - (k + b) * A(a, b, n - 1, k);
+		}
 	}
 
 	// generalized logistic f(a,b;x) = e^{-a x}/(1 + e^{-x})^{a + b} / B(a,b)
@@ -49,41 +66,43 @@ namespace fms::variate {
 	struct logistic {
 		typedef X xtype;
 		typedef S stype;
-		X a, b;
+		X a, b, Bab;
 		logistic(X a = 1, X b = 1)
-			: a(a), b(b)
+			: a(a), b(b), Bab(gsl_sf_beta(a, b))
 		{ }
 
 		// (d/dx)^n 1/(1 + e^{-x}) = sum_{k=1}^n A_{n,k} e^{-k x}/(1 + e^{-x})^{k + 1}
-		static X cdf0(X x, size_t n = 0)
+		// (d/dx)^n f(x) = sum_{k=0}^n A_{n,k} e^{-(k + b) x}/(1 + e^{-x})^{k + a + b}
+		//               = e^{-b x}/(1 + e^{-x})^{a + b} sum_{k=0}^n A_{n,k} 1/(e^{-x} (1 + e^{-x}))^k
+		X cdf0(X x, size_t n = 0)
 		{
-			X e = exp(-x);
-
+			ensure(a > 0 and b > 0);
+	
 			if (n == 0) {
-				return 1/(1 + e);
+				return beta_inc(a, b, 1 / (1 + exp(-x)));
 			}
 
-			X f = 0;
-			X e_ = e;
-			X e1_ = 1 + e;
-			for (size_t k = 1; k <= n; ++k) {
-				e1_ *= 1 + e;
-				f += A(n, k) * e_ / e1_;
-				e_ *= e;
+			X Ak = 0;
+			X n_ = static_cast<X>(n - 1);
+			X e = exp(-x) * (1 + exp(-x));
+			X e_k = 1; // e^{-k}
+			for (size_t k = 0; k <= n_; ++k) {
+				Ak += A(a, b, n_, k) * e_k;
+				e_k /= e;
 			}
 
-			return f;
+			return exp(-b * x) * pow(1 + exp(-x), -a - b) * Ak / Bab;
 		}
-		static X cdf(X x, S s = 0, size_t n = 0)
+		X cdf(X x, S s = 0, size_t n = 0)
 		{
-			ensure(-1 < s and s < 1);
+			ensure(-a < s and s < b);
 
 			if (s == 0) {
 				return cdf0(x, n);
 			}
 
 			if (n == 0) {
-				return beta_inc(1 + s, 1 - s, 1/(1 + exp(-x)));
+				return beta_inc(a + s, b - s, 1/(1 + exp(-x)));
 			}
 
 			X f = 0;
@@ -95,23 +114,32 @@ namespace fms::variate {
 
 			return exp(s * x - cumulant(s, 0)) * f;
 		}
-		static S cumulant(S s, size_t n = 0)
+		S cumulant(S s, size_t n = 0)
 		{
 			ensure(-1 < s and s < 1);
 
 			if (n == 0) {
-				return gsl_sf_lngamma(1 + s) + gsl_sf_lngamma(1 - s);
+				return gsl_sf_lngamma(a + s) + gsl_sf_lngamma(b - s);
 			}
 
 			int n_ = static_cast<int>(n - 1);
 
-			return gsl_sf_psi_n(n_, 1 + s) + ((n_&1) ? 1 : -1) * gsl_sf_psi_n(n_, 1 - s);
+			return gsl_sf_psi_n(n_, a + s) + ((n_&1) ? 1 : -1) * gsl_sf_psi_n(n_, b - s);
 		}
 		static X edf(X x, S s)
 		{
 			X u = cdf0(x, 0);
 
 			return beta_inc_1(1 + s, 1 - s, u) - beta_inc_2(1 + s, 1 - s, u);
+		}
+
+		static X beta(X a, X b)
+		{
+			return gsl_sf_beta(a, b);
+		}
+		static X beta_1(X a, X b)
+		{
+			return gsl_sf_beta(a, b) * (gsl_sf_psi_n(0, a) - gsl_sf_psi_n(0, a + b));
 		}
 
 		static X beta_inc(X a, X b, X u)

@@ -63,7 +63,7 @@ namespace fms::sf {
 		// policy based convergence
 		std::tuple<X, X, int, int> value(X x, X eps = sqrt_eps, int skip = 40, int terms = 40)
 		{
-			X dF, maxF = 1;
+			X dF = 0, maxF = 1;
 			int ignore = skip; // number of consecutive small terms to skip
 			int small = 0; // total number of terms skipped
 			int iters = 0; // number of iterations performed
