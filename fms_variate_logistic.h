@@ -42,36 +42,41 @@ namespace fms::variate {
 			return (n == 0 or k > n) ? 0 : C(n - 1, k) + C(n - 1, k - 1);
 		}
 
-		// A_{n,k} = (k - 1 + a + b) A_{n-1, k-1} - (k + b) A_{n-1, k}
+		// A_{n,k} = - (b + k) A_{n-1, k} + (a + b + k - 1) A_{n-1, k-1} 
 		template<class X = double>
 		inline X A(X a, X b, unsigned n, unsigned k)
 		{
-			if (n == 0) {
-				return k == 0;
+			if (k > n) {
+				return 0;
 			}
-			if (k == 0) {
-				return -(k + b) * A(a, b, n - 1, 0);
-			}
-			if (k == n) {
-				return (k - 1 + a + b) * A(a, b, n - 1, n - 1);
+			if (n == 0 and k == 0) {
+				return 1;
 			}
 
-			return (k - 1 + a + b) * A(a, b, n - 1, k - 1) - (k + b) * A(a, b, n - 1, k);
+			return -(b + k) * A(a, b, n - 1, k) + (a + b + k - 1) * A(a, b, n - 1, k - 1);
 		}
 	}
 
 #ifdef _DEBUG
 	template<class X>
-	inline void check_A(X a, X b) 
+	inline void check_A(X a, X b)
 	{
-		assert(A(a, b, 0, 0) == 1);
-		assert(A(a, b, 0, 1) == 0);
-		assert(A(a, b, 0, -1) == 0);
+		static constexpr X eps = std::numeric_limits<X>::epsilon();
+		auto eq = [](X x, X y) { return abs(x - y) <= 10*eps; };
+		assert(eq(A(a, b, 0, 0), 1));
+		assert(eq(A(a, b, 0, 1), 0));
+		assert(eq(A(a, b, 0, -1), 0));
 
-		assert(A(a, b, 1, 0) == -b);
-		assert(A(a, b, 1, 1) == a + b);
-		assert(A(a, b, 1, 2) == 0);
-		assert(A(a, b, 1, -1) == 0);
+		assert(eq(A(a, b, 1, 0), -b));
+		assert(eq(A(a, b, 1, 1), a + b));
+		assert(eq(A(a, b, 1, 2), 0));
+		assert(eq(A(a, b, 1, -1), 0));
+
+		assert(eq(A(a, b, 2, 0), b * b));
+		assert(eq(A(a, b, 2, 1), -(a + b) * (1 + 2 * b)));
+		assert(eq(A(a, b, 2, 2), (1 + a + b) * (a + b)));
+		assert(eq(A(a, b, 2, 3), 0));
+		assert(eq(A(a, b, 2, -1), 0));
 	}
 #endif // _DEBUT
 
@@ -86,27 +91,27 @@ namespace fms::variate {
 			: a(a), b(b), Bab(gsl_sf_beta(a, b))
 		{ }
 
-		// (d/dx)^n 1/(1 + e^{-x}) = sum_{k=1}^n A_{n,k} e^{-k x}/(1 + e^{-x})^{k + 1}
-		// (d/dx)^n f(x) = sum_{k=0}^n A_{n,k} e^{-(k + b) x}/(1 + e^{-x})^{k + a + b}
-		//               = e^{-b x}/(1 + e^{-x})^{a + b} sum_{k=0}^n A_{n,k} 1/(e^{-x} (1 + e^{-x}))^k
+		// (d/dx)^n f(x) = sum_{k=0}^n A_{n,k} e^{-(b + k) x}/(1 + e^{-x})^{a + b + k}
 		X cdf0(X x, unsigned n = 0)
 		{
 			ensure(a > 0 and b > 0);
+
+			X e_x = exp(-x);
 	
 			if (n == 0) {
-				return beta_inc(a, b, 1 / (1 + exp(-x)));
+				return beta_inc(a, b, 1 / (1 + e_x));
 			}
 
-			X Ak = 0;
 			unsigned n_ = n - 1;
-			X e = exp(-x) * (1 + exp(-x));
-			X e_k = 1; // e^{-k}
+			X e_ = e_x / (1 + e_x);
+			X e_k = 1; // e_^k
+			X Ak = 0;
 			for (unsigned k = 0; k <= n_; ++k) {
 				Ak += A(a, b, n_, k) * e_k;
-				e_k /= e;
+				e_k *= e_;
 			}
 
-			return exp(-b * x) * pow(1 + exp(-x), -a - b) * Ak / Bab;
+			return exp(-b * x) * pow(1 + e_x, -a - b) * Ak / Bab;
 		}
 		X cdf(X x, S s = 0, unsigned n = 0)
 		{
