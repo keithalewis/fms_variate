@@ -76,6 +76,18 @@ int test_variate_logistic()
 			}
 		}
 	}
+	{
+		logistic<X> v;
+
+		auto ss = range(X(-0.1), X(0.2), X(0.1));
+		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
+
+		for (auto n : { 0, 1, 2, 3 }) {
+			auto f = [n, &v](X s) { return v.cumulant(s, n); };
+			auto df = [n, &v](X s) { return v.cumulant(s, n + 1); };
+			check(f, df, ss, hs);
+		}
+	}
 
 
 	return 0;

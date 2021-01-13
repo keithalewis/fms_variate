@@ -128,7 +128,8 @@ namespace fms::variate {
 			ensure(-1 < s and s < 1);
 
 			if (n == 0) {
-				return gsl_sf_lngamma(a + s) + gsl_sf_lngamma(b - s);
+				return gsl_sf_lngamma(a + s) - gsl_sf_lngamma(a) 
+				     + gsl_sf_lngamma(b - s) - gsl_sf_lngamma(b);
 			}
 
 			int n_ = static_cast<int>(n - 1);
