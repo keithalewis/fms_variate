@@ -65,10 +65,10 @@ int test_variate_logistic()
 		logistic<X> v;
 
 		auto xs = range<X>(-2, 3, 1);
-		//auto ss = range(X(-0.1), X(0.2), X(0.1));
+		auto ss = range(X(-0.1), X(0.2), X(0.1));
 		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
 
-		for (auto s : { 0 }) {
+		for (auto s : ss) {
 			for (auto n : { 0, 1, 2, 3 }) {
 				auto f = [s, n, &v](X x) { return v.cdf(x, s, n); };
 				auto df = [s, n, &v](X x) { return v.cdf(x, s, n + 1); };

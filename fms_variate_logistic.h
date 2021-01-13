@@ -42,7 +42,7 @@ namespace fms::variate {
 			return (n == 0 or k > n) ? 0 : C(n - 1, k) + C(n - 1, k - 1);
 		}
 
-		// A_{n,k} = - (b + k) A_{n-1, k} + (a + b + k - 1) A_{n-1, k-1} 
+		// A_{n,k} = - (b + k) A_{n-1, k} + (a + b + k - 1) A_{n-1, k-1}, A_{0,0} = 1
 		template<class X = double>
 		inline X A(X a, X b, unsigned n, unsigned k)
 		{
@@ -80,19 +80,19 @@ namespace fms::variate {
 	}
 #endif // _DEBUT
 
-	// generalized logistic f(a,b;x) = e^{-a x}/(1 + e^{-x})^{a + b} / B(a,b)
+	// generalized logistic density is f(a,b;x) = e^{-b x}/(1 + e^{-x})^{a + b} / B(a,b)
 	template<class X = double, class S = X>
 		requires std::is_floating_point_v<X> && std::is_floating_point_v<S>
 	struct logistic {
 		typedef X xtype;
 		typedef S stype;
-		X a, b, Bab;
+		X a, b;
 		logistic(X a = 1, X b = 1)
-			: a(a), b(b), Bab(gsl_sf_beta(a, b))
+			: a(a), b(b)
 		{ }
 
 		// (d/dx)^n f(x) = sum_{k=0}^n A_{n,k} e^{-(b + k) x}/(1 + e^{-x})^{a + b + k}
-		X cdf0(X x, unsigned n = 0)
+		static X cdf0(X a, X b, X x, unsigned n = 0)
 		{
 			ensure(a > 0 and b > 0);
 
@@ -111,28 +111,17 @@ namespace fms::variate {
 				e_k *= e_;
 			}
 
-			return exp(-b * x) * pow(1 + e_x, -a - b) * Ak / Bab;
+			return exp(-b * x) * pow(1 + e_x, -a - b) * Ak / gsl_sf_beta(a, b);
 		}
 		X cdf(X x, S s = 0, unsigned n = 0)
 		{
 			ensure(-a < s and s < b);
 
-			if (s == 0) {
-				return cdf0(x, n);
-			}
-
 			if (n == 0) {
 				return beta_inc(a + s, b - s, 1/(1 + exp(-x)));
 			}
 
-			X f = 0;
-			S sk = 1; // s^k
-			for (unsigned k = 0; k < n; ++k) {
-				f += gsl_sf_choose((unsigned int)n - 1, (unsigned int)k) * cdf0(x, n - k) * sk;
-				sk *= s;
-			}
-
-			return exp(s * x - cumulant(s, 0)) * f;
+			return cdf0(a + s, b - s, x, n);
 		}
 		S cumulant(S s, unsigned n = 0)
 		{
