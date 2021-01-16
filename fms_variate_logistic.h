@@ -12,22 +12,6 @@
 namespace fms::variate {
 
 	namespace {
-		inline constexpr int64_t A(uint64_t n, uint64_t k)
-		{
-			if (n == 0 or k > n) {
-				return 0;
-			}
-
-			if (k == 1) {
-				return (n & 1) ? 1 : -1;
-			}
-
-			if (n == 1) {
-				return k == 1;
-			}
-
-			return k * (A(n - 1, k - 1) - A(n - 1, k));
-		}
 		// n choose k
 		inline constexpr uint64_t C(uint64_t n, uint64_t k)
 		{
@@ -99,7 +83,7 @@ namespace fms::variate {
 			X e_x = exp(-x);
 	
 			if (n == 0) {
-				return beta_inc(a, b, 1 / (1 + e_x));
+				return gsl_sf_beta_inc(a, b, 1 / (1 + e_x));
 			}
 
 			unsigned n_ = n - 1;
@@ -118,7 +102,7 @@ namespace fms::variate {
 			ensure(-a < s and s < b);
 
 			if (n == 0) {
-				return beta_inc(a + s, b - s, 1/(1 + exp(-x)));
+				return gsl_sf_beta_inc(a + s, b - s, 1/(1 + exp(-x)));
 			}
 
 			return cdf0(a + s, b - s, x, n);
@@ -136,18 +120,26 @@ namespace fms::variate {
 
 			return gsl_sf_psi_n(n_, a + s) + ((n_&1) ? 1 : -1) * gsl_sf_psi_n(n_, b - s);
 		}
-		static X edf(X x, S s)
+
+		// d/ds F_s(a,b;x) = d/ds F(a + s, b - s; x) = F_s(a + s, b - s; x) log u(1 - u)
+		X edf(X x, S s) const
 		{
-			X u = cdf0(1, 1, x, 0);
+			X u = 1 / (1 + exp(-x));
 
-			return beta_inc_1(1 + s, 1 - s, u) - beta_inc_2(1 + s, 1 - s, u);
+			return log(u * (1 - u)) * cdf0(a + s, b - s, x);
 		}
-
+		
 		static X beta(X a, X b)
 		{
 			return gsl_sf_beta(a, b);
 		}
+		// d/da B(a,b)
 		static X beta_1(X a, X b)
+		{
+			return gsl_sf_beta(a, b) * (gsl_sf_psi_n(0, a) - gsl_sf_psi_n(0, a + b));
+		}
+		// d/db B(a,b)
+		static X beta_2(X a, X b)
 		{
 			return gsl_sf_beta(a, b) * (gsl_sf_psi_n(0, a) - gsl_sf_psi_n(0, a + b));
 		}
@@ -157,21 +149,22 @@ namespace fms::variate {
 			return gsl_sf_beta_inc(a, b, u);
 		}
 
-		// d/da I_u(a, b) = (log u - psi(a) + psi(a + b)) I_u(a,b)
+		// d/da B_u(a, b) = (log u - psi(a) + psi(a + b)) I_u(a,b)
 		static X beta_inc_1(X a, X b, X u)
 		{
 			X Iu = beta_inc(a, b, u);
 
 			return (log(u) - gsl_sf_psi_n(0, a) + gsl_sf_psi_n(0, a + b)) * Iu;
 		}
-		// I_u(a, b) = 1 - I_{1 - u}(b, a)
-		// d/db I_u(a, b) = d/db 1 - I_{1 - u}(b, a)
+		// B_u(a, b) = 1 - B_{1 - u}(b, a)
+		// d/db B_u(a, b) = d/db 1 - I_{1 - u}(b, a)
 		static X beta_inc_2(X a, X b, X u)
 		{
 			X Iu_ = beta_inc(b, a, 1 - u);
 
 			return -(log(1 - u) - gsl_sf_psi_n(0, b) + gsl_sf_psi_n(0, b + a)) * Iu_;
 		}
+		
 	};
 
 }
