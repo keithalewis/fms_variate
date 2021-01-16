@@ -10,7 +10,7 @@
 namespace fms::test {
 
 	template<class F>
-	inline std::function<void(void)> repeat(size_t n, const F& f)
+	inline std::function<void(void)> repeat(unsigned n, const F& f)
 	{
 		return [&n, f]() { while (n--) f(); };
 	}

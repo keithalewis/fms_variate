@@ -113,7 +113,7 @@ namespace fms::variate {
 
 			return exp(-b * x) * pow(1 + e_x, -a - b) * Ak / gsl_sf_beta(a, b);
 		}
-		X cdf(X x, S s = 0, unsigned n = 0)
+		X cdf(X x, S s = 0, unsigned n = 0) const
 		{
 			ensure(-a < s and s < b);
 
@@ -123,7 +123,7 @@ namespace fms::variate {
 
 			return cdf0(a + s, b - s, x, n);
 		}
-		S cumulant(S s, unsigned n = 0)
+		S cumulant(S s, unsigned n = 0) const
 		{
 			ensure(-1 < s and s < 1);
 
@@ -138,7 +138,7 @@ namespace fms::variate {
 		}
 		static X edf(X x, S s)
 		{
-			X u = cdf0(x, 0);
+			X u = cdf0(1, 1, x, 0);
 
 			return beta_inc_1(1 + s, 1 - s, u) - beta_inc_2(1 + s, 1 - s, u);
 		}

@@ -13,7 +13,7 @@
 namespace fms {
 
 	template<typename V, class X = typename V::xtype, class S = typename V::stype>
-	concept variate_concept = requires (V v, X x, S s, size_t n) {
+	concept variate_concept = requires (V v, X x, S s, unsigned n) {
 		std::semiregular<V>;
 		{ v.cdf(x, s, n) } -> std::convertible_to<X>;
 		{ v.cumulant(s, n) } -> std::convertible_to<S>;
@@ -25,7 +25,7 @@ namespace fms {
 		// affine transformation mu + sigma X
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
 		class affine {
-			V v;
+			const V& v;
 			X mu, sigma;
 		public:
 			typedef X xtype;
@@ -35,12 +35,12 @@ namespace fms {
 				: v(v), mu(mu), sigma(sigma == 0 ? 1 : sigma)
 			{ }
 
-			X cdf(X x, S s = 0, size_t n = 0) const
+			X cdf(X x, S s = 0, unsigned n = 0) const
 			{
 				return v.cdf((x - mu) / sigma, s, n) / pow(sigma, X(n));
 			}
 
-			S cumulant(S s, size_t n = 0) const
+			S cumulant(S s, unsigned n = 0) const
 			{
 				return v.cumulant(sigma * s, n) * pow(sigma, X(n)) + (n == 0 ? mu * s : n == 1 ? mu : 0);
 			}
@@ -52,13 +52,13 @@ namespace fms {
 		};
 
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
-		inline X cdf(const V& v, X x, S s = 0, size_t n = 0)
+		inline X cdf(const V& v, X x, S s = 0, unsigned n = 0)
 		{
 			return v.cdf(x, s, n);
 		}
 
 		template<variate_concept V, class S = typename V::stype>
-		inline S cumulant(const V& v, S s, size_t n = 0)
+		inline S cumulant(const V& v, S s, unsigned n = 0)
 		{
 			return v.cumlant(s, n);
 		}

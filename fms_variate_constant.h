@@ -18,7 +18,7 @@ namespace fms::variate {
 		{ }
 
 		// F_s(x) = 1(c <= x) independent of s
-		X cdf(X x, S s = 0, size_t n = 0) const
+		X cdf(X x, S s = 0, unsigned n = 0) const
 		{
 			if (n == 0) {
 				return 1 * (c <= x);
@@ -33,7 +33,7 @@ namespace fms::variate {
 		}
 
 		// κ(s) = cs
-		S cumulant(S s, size_t n = 0) const
+		S cumulant(S s, unsigned n = 0) const
 		{
 			if (n == 0) {
 				return c * s;
