@@ -122,7 +122,7 @@ namespace fms::variate {
 		}
 
 		// d/ds F_s(a,b;x) = d/ds F(a + s, b - s; x) = F_s(a + s, b - s; x) log u(1 - u)
-		X edf(X x, S s) const
+		X edf(S s, X x) const
 		{
 			X u = 1 / (1 + exp(-x));
 

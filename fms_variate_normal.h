@@ -53,7 +53,7 @@ namespace fms::variate {
 		}
 
 		// (d/ds) cdf(x, s, 0)
-		static X edf(X x, S s)
+		static X edf(S s, X x)
 		{
 			return -cdf(x, s, 1);
 		}

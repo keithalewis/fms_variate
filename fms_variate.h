@@ -1,10 +1,15 @@
 ﻿// fms_variate.h - Random variates.
-// 
-// A random variable $X$ is determined by its cumulative distribution function $F(x) = P(X <= x)$. 
-// Its cumulant is $κ(s) = \log E[\exp(s X)]$ and its Esscher transform $X_s$ is defined by 
-// $P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - κ(s))]$.
-// A variate must implment the derivatives of the cdf of $X_s$, cumulant, and sega,
-// where sega is the derivative of the cdf of $X_s$ with respect to s.
+#define FMS_DOC(name) inline static const char8_t fms_ ## name ## _documentation[]
+
+//inline static const char8_t* fms_variate_documentation 
+FMS_DOC(variate) = u8R"xyzyx(
+A random variable \(X\) is determined by its cumulative distribution function \(F(x) = P(X <= x)\). 
+Its cumulant is \(κ(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
+\(F_s(x) = P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - κ(s))]\).
+Expected value under \(P_s\) is denoted \(E_s\).
+A variate must implment the derivatives of the cdf, cumulant, and edf,
+where edf is the derivative of the cdf of \(X_s\) with respect to s.
+)xyzyx";
 
 #pragma once
 #include <concepts>
@@ -17,7 +22,7 @@ namespace fms {
 		std::semiregular<V>;
 		{ v.cdf(x, s, n) } -> std::convertible_to<X>;
 		{ v.cumulant(s, n) } -> std::convertible_to<S>;
-		{ v.edf(x, s) } -> std::convertible_to<X>;
+		{ v.edf(s, x) } -> std::convertible_to<X>;
 	};
 
 	namespace variate {
@@ -31,10 +36,16 @@ namespace fms {
 			typedef X xtype;
 			typedef S stype;
 
+			FMS_DOC(affine) = u8R"xyzyx(
+Given a variate \(X\) construct the variate \(\mu + \sigma X\).
+)xyzyx";
 			affine(const V& v, X mu = 0, X sigma = 1)
 				: v(v), mu(mu), sigma(sigma == 0 ? 1 : sigma)
 			{ }
 
+			FMS_DOC(affine_cdf) = u8R"xyzyx(
+Return the \(n\)-th derivative of the transformed cumulative distribution function.
+)xyzyx";
 			X cdf(X x, S s = 0, unsigned n = 0) const
 			{
 				return v.cdf((x - mu) / sigma, s, n) / pow(sigma, X(n));
@@ -45,9 +56,9 @@ namespace fms {
 				return v.cumulant(sigma * s, n) * pow(sigma, X(n)) + (n == 0 ? mu * s : n == 1 ? mu : 0);
 			}
 
-			S edf(X x, S s) const
+			S edf(S s, X x) const
 			{
-				return sigma * v.edf((x - mu)/sigma, sigma * s);
+				return sigma * v.edf(sigma * s, (x - mu)/sigma);
 			}
 		};
 
@@ -64,9 +75,9 @@ namespace fms {
 		}
 
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
-		inline X edf(const V& v, X x, S s)
+		inline X edf(const V& v, S s, X x)
 		{
-			return v.edf(x, s);
+			return v.edf(s, x);
 		}
 
 		template<variate_concept V, class X = typename V::xtype>

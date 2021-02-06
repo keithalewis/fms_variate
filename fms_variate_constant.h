@@ -46,7 +46,7 @@ namespace fms::variate {
 		}
 
 		// F_s(x) = 1(c <= x) does not depend on s
-		X edf(X, S) const
+		X edf(S, X) const
 		{
 			return 0;
 		}

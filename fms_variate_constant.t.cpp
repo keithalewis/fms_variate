@@ -24,9 +24,9 @@ int test_variate_constant()
 			assert(c.cumulant(s, 2) == 0);
 			assert(c.cumulant(s, 3) == 0);
 
-			assert(c.edf(1.22, s) == 0);
-			assert(c.edf(1.23, s) == 0);
-			assert(c.edf(1.24, s) == 0);
+			assert(c.edf(s, 1.22) == 0);
+			assert(c.edf(s, 1.23) == 0);
+			assert(c.edf(s, 1.24) == 0);
 		}
 	}
 
