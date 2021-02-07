@@ -1,11 +1,12 @@
 ﻿// fms_variate.h - Random variates.
-#define FMS_DOC(name) inline static const char8_t fms_ ## name ## _documentation[]
+#define FMS_DOC(name) inline static const char name ## _doc[]
+#define FMS_HELP(name) inline static const char name ## _help[]
 
 //inline static const char8_t* fms_variate_documentation 
-FMS_DOC(variate) = u8R"xyzyx(
+FMS_DOC(variate) = R"xyzyx(
 A random variable \(X\) is determined by its cumulative distribution function \(F(x) = P(X <= x)\). 
-Its cumulant is \(κ(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
-\(F_s(x) = P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - κ(s))]\).
+Its cumulant is \(\kappa(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
+\(F_s(x) = P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - \kappa(s))]\).
 Expected value under \(P_s\) is denoted \(E_s\).
 A variate must implment the derivatives of the cdf, cumulant, and edf,
 where edf is the derivative of the cdf of \(X_s\) with respect to s.
@@ -28,6 +29,10 @@ namespace fms {
 	namespace variate {
 
 		// affine transformation mu + sigma X
+		FMS_HELP(affine) = R"(Affine transformation mu + sigma X)";
+		FMS_DOC(affine) = R"xyzyx(
+Given a variate \(X\) construct the variate \(\mu + \sigma X\).
+)xyzyx";
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
 		class affine {
 			const V& v;
@@ -36,16 +41,10 @@ namespace fms {
 			typedef X xtype;
 			typedef S stype;
 
-			FMS_DOC(affine) = u8R"xyzyx(
-Given a variate \(X\) construct the variate \(\mu + \sigma X\).
-)xyzyx";
 			affine(const V& v, X mu = 0, X sigma = 1)
 				: v(v), mu(mu), sigma(sigma == 0 ? 1 : sigma)
 			{ }
 
-			FMS_DOC(affine_cdf) = u8R"xyzyx(
-Return the \(n\)-th derivative of the transformed cumulative distribution function.
-)xyzyx";
 			X cdf(X x, S s = 0, unsigned n = 0) const
 			{
 				return v.cdf((x - mu) / sigma, s, n) / pow(sigma, X(n));
@@ -62,18 +61,31 @@ Return the \(n\)-th derivative of the transformed cumulative distribution functi
 			}
 		};
 
+		FMS_DOC(cdf) = R"xyzyx(
+Returns the \(n\)-th derivative of the Esscher transformed cumulative distrubution.
+The <em>Esscher transform</em> of the density function \(f\) of a random variable \(X\) is 
+\(f_s(x) = f(x)e^{sX - \kappa(s)}\) whenever the <a href="VARIATE.CUMULANT.html">cumulant</a> 
+\(\kappa(s)\) exists.
+)xyzyx";
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
 		inline X cdf(const V& v, X x, S s = 0, unsigned n = 0)
 		{
 			return v.cdf(x, s, n);
 		}
 
+		FMS_DOC(cumulant) = R"xyzyx(
+Return the \(n\)-th derivative of the cumulant \(\kappa(s) = \log(E[e^{sX}]).
+)xyzyx";
 		template<variate_concept V, class S = typename V::stype>
 		inline S cumulant(const V& v, S s, unsigned n = 0)
 		{
 			return v.cumlant(s, n);
 		}
 
+		FMS_DOC(edf) = R"xyzyx(
+Return the derivative of the Esscher transformed distribution with respect to \(s\),
+\(\partial F_s(x)/\partial s = E[1(X \le x)e^{sX - \kappa(s)}(X - \kappa'(s))].
+)xyzyx";
 		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
 		inline X edf(const V& v, S s, X x)
 		{
