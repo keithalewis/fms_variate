@@ -1,20 +1,10 @@
 ﻿// fms_variate.h - Random variates.
-#define FMS_DOC(name) inline static const char name ## _doc[]
-#define FMS_HELP(name) inline static const char name ## _help[]
-
-//inline static const char8_t* fms_variate_documentation 
-FMS_DOC(variate) = R"xyzyx(
-A random variable \(X\) is determined by its cumulative distribution function \(F(x) = P(X <= x)\). 
-Its cumulant is \(\kappa(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
-\(F_s(x) = P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - \kappa(s))]\).
-Expected value under \(P_s\) is denoted \(E_s\).
-A variate must implment the derivatives of the cdf, cumulant, and edf,
-where edf is the derivative of the cdf of \(X_s\) with respect to s.
-)xyzyx";
-
 #pragma once
 #include <concepts>
 #include <cmath>
+
+#define FMS_DOC(name) inline static const char name ## _doc[]
+#define FMS_HELP(name) inline static const char name ## _help[]
 
 namespace fms {
 
@@ -25,6 +15,16 @@ namespace fms {
 		{ v.cumulant(s, n) } -> std::convertible_to<S>;
 		{ v.edf(s, x) } -> std::convertible_to<X>;
 	};
+
+	//inline static const char8_t* fms_variate_documentation 
+	FMS_DOC(variate) = R"xyzyx(
+A random variable \(X\) is determined by its cumulative distribution function \(F(x) = P(X <= x)\). 
+Its cumulant is \(\kappa(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
+\(F_s(x) = P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - \kappa(s))]\).
+Expected value under \(P_s\) is denoted \(E_s\).
+A variate must implment the derivatives of the cdf, cumulant, and edf,
+where edf is the derivative of the cdf of \(X_s\) with respect to s.
+)xyzyx";
 
 	namespace variate {
 
@@ -43,6 +43,10 @@ Given a variate \(X\) construct the variate \(\mu + \sigma X\).
 
 			affine(const V& v, X mu = 0, X sigma = 1)
 				: v(v), mu(mu), sigma(sigma == 0 ? 1 : sigma)
+			{ }
+			affine(const affine&) = default;
+			affine& operator=(const affine&) = default;
+			~affine()
 			{ }
 
 			X cdf(X x, S s = 0, unsigned n = 0) const

@@ -68,6 +68,7 @@ namespace fms::variate {
 	static inline const char logistic_doc[] = R"xyzyx(
 The generalized logistic density function is \(f(\alpha, \beta; x) 
 = e^{-\beta x} (1 + e^{-x}))^{-\alpha - \beta}/B(\alpha, \beta)\), \(-\infty < x < \infty\).
+Where \(B(\alpha,\beta)\) is the beta function. 
 )xyzyx";
 	template<class X = double, class S = X>
 		requires std::is_floating_point_v<X> && std::is_floating_point_v<S>
