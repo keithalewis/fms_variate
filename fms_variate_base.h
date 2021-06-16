@@ -69,3 +69,59 @@ the derivative of the cdf of \(X_s\) with respect to \(s\), called sega.
 	}
 
 }
+/*
+		FMS_DOC(cdf) = R"xyzyx(
+Returns the \(n\)-th derivative of the Esscher transformed cumulative distrubution.
+The <em>Esscher transform</em> of the density function \(f\) of a random variable \(X\) is 
+\(f_s(x) = f(x)e^{sX - \kappa(s)}\) whenever the <a href="VARIATE.CUMULANT.html">cumulant</a> 
+\(\kappa(s)\) exists.
+)xyzyx";
+		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
+		inline X cdf(const V& v, X x, S s = 0, unsigned n = 0)
+		{
+			return v.cdf(x, s, n);
+		}
+
+		FMS_DOC(cumulant) = R"xyzyx(
+Return the \(n\)-th derivative of the cumulant \(\kappa(s) = \log(E[e^{sX}]).
+)xyzyx";
+		template<variate_concept V, class S = typename V::stype>
+		inline S cumulant(const V& v, S s, unsigned n = 0)
+		{
+			return v.cumlant(s, n);
+		}
+
+		FMS_DOC(edf) = R"xyzyx(
+Return the derivative of the Esscher transformed distribution with respect to \(s\),
+\(\partial F_s(x)/\partial s = E[1(X \le x)e^{sX - \kappa(s)}(X - \kappa'(s))].
+)xyzyx";
+		template<variate_concept V, class X = typename V::xtype, class S = typename V::stype>
+		inline X edf(const V& v, S s, X x)
+		{
+			return v.edf(s, x);
+		}
+
+		template<variate_concept V, class X = typename V::xtype>
+		inline X mean(const V& v)
+		{
+			return v.cumulant(0, 1);
+		}
+
+		template<variate_concept V, class X = typename V::xtype>
+		inline X variance(const V& v)
+		{
+			return v.cumulant(0, 2);
+		}
+
+	}
+
+	template<variate_concept V>
+	struct variate_model : public V {
+		using V::V;
+	};
+
+	//template<class X = double, class S = X>
+	//using XXX = variate_model<XXX_impl>;
+
+}
+*/

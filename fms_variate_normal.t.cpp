@@ -2,40 +2,12 @@
 
 #include <cassert>
 #include <vector>
+#include "fms_test.h"
 #include "fms_variate.h"
 #include "fms_variate_normal.h"
 
-using namespace fms;
+using namespace fms::test;
 using namespace fms::variate;
-// f'(x) + f'''(x)h^2/6 + ...
-template<class F, class X>
-inline X diff(const F& f, X x, X h)
-{
-	return (f(x + h) - f(x - h)) / (2 * h);
-}
-
-template<class X>
-inline void check(X df, X f1, X h)
-{
-	X err = fabs(df - f1);
-	X rem = h * h;
-	X y;
-	y = err / rem;
-
-	assert(fabs(df - f1) < 40 * h * h);
-}
-
-template<class X>
-inline std::vector<X> range(X a, X b, X h)
-{
-	std::vector<X> r;
-
-	for (X x = a; x < b; x += h) {
-		r.push_back(x);
-	}
-
-	return r;
-}
 
 template<class X>
 int test_hermite()
@@ -59,24 +31,19 @@ int test_variate_normal()
 	//X dx = X(0.001);
 
 	{
-		standard_normal<X> n;
+		standard_normal<X> N;
 
-		for (size_t k : {0, 1, 2, 3}) {
-			for (X x : range<X>(-2, 3, 1)) {
-				for (X s : range(X(-0.1), X(0.2), X(0.1))) {
-					for (X h : range<X>(2, 4, 1)) {
-						h = pow(X(10), -h);
-						
-						X df = diff([k, x, s, h, &n](X x) { return n.cdf(x, s, k); }, x, h);
-						check(df, n.cdf(x, s, k + 1), h);
+		auto xs = range<X>(-2, 3, 1);
+		auto ss = range(X(-0.1), X(0.2), X(0.1));
+		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
 
-						X ds = diff([x, s, h, &n](X s) { return n.cdf(x, s); }, s, h);
-						check(ds, n.edf(x, s), h);
-					}
-				}
+		for (auto s : ss) {
+			for (auto n : { 0, 1, 2, 3 }) {
+				auto f = [s, n, &N](X x) { return N.cdf(x, s, n); };
+				auto df = [s, n, &N](X x) { return N.cdf(x, s, n + 1); };
+				check(f, df, xs, hs);
 			}
 		}
-
 	}
 	{
 		standard_normal<X> n;
@@ -99,5 +66,5 @@ int test_variate_normal()
 	}
 	return 0;
 }
-int test_variate_normal_f = test_variate_normal<float>();
+//int test_variate_normal_f = test_variate_normal<float>();
 int test_variate_normal_d = test_variate_normal<double>();

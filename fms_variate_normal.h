@@ -6,7 +6,7 @@ namespace fms::variate {
 
 	// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
 	template<class X>
-	inline constexpr X Hermite(size_t n, X x)
+	inline constexpr X Hermite(unsigned n, X x)
 	{
 		if (n == 0) {
 			return X(1);
@@ -31,7 +31,12 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
-		static X cdf(X x, S s = 0, size_t n = 0)
+		/*
+		standard_normal()
+		{ }
+		*/
+
+		static X cdf(X x, S s = 0, unsigned n = 0)
 		{
 			X x_ = x - s;
 
@@ -50,12 +55,12 @@ namespace fms::variate {
 		}
 
 		// (d/ds) cdf(x, s, 0)
-		static X edf(X x, S s)
+		static X edf(S s, X x)
 		{
 			return -cdf(x, s, 1);
 		}
 
-		static S cumulant(S s, size_t n = 0)
+		static S cumulant(S s, unsigned n = 0)
 		{
 			if (n == 0) {
 				return s * s / 2;
@@ -69,11 +74,12 @@ namespace fms::variate {
 
 			return S(0);
 		}
+		
 		/*
-		template<size_t N>
+		template<unsigned N>
 		static S cumulant(S s)
 		{
-			epsilon<N, S> s_(s);
+			epsilon<S,N> s_(s);
 
 			return s_ * s_ / 2;
 		}

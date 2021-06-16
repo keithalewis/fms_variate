@@ -51,6 +51,7 @@ namespace fms::variate {
 
 			return 0;
 		}
+
 	};
 
 }
