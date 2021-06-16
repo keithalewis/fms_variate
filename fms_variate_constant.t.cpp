@@ -1,5 +1,6 @@
 // fms_variate_constant.t.cpp - test constant variate
 #include <cassert>
+#include <initializer_list>
 #include "fms_variate_constant.h"
 
 using namespace fms::variate;

@@ -23,7 +23,9 @@ namespace fms::variate {
 	template<class X = double, class S = X>
 	class standard_normal
 	{
+#ifndef M_SQRT2
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
+#endif
 		static constexpr X M_SQRT2PI = X(2.50662827463100050240);
 	public:
 		typedef X xtype;
