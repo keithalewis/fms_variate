@@ -38,7 +38,7 @@ namespace fms::test {
 	inline void check(X df, const F& f, X x, X h, X O = 150)
 	{
 		X f1 = diff(f, x, h);
-		O = O * std::max({ X(1), abs(df), abs(f1) });
+		O = O * std::max({ X(1), fabs(df), fabs(f1) });
 		X o = fabs(df - f1) / (h * h);
 		X o_ = 1 / o;
 

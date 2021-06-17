@@ -3,10 +3,10 @@
 #include <cassert>
 #include <vector>
 #include "fms_test.h"
-#include "fms_variate.h"
 #include "fms_variate_normal.h"
 
 using namespace fms::test;
+using namespace fms::polynomial;
 using namespace fms::variate;
 
 template<class X>

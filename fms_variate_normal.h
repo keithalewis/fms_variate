@@ -1,28 +1,14 @@
 // fms_variate_normal.h - normal distribution
 #pragma once
 #include <cmath>
+#include "fms_polynomial_hermite.h"
+#include "fms_variate_base.h"
 
 namespace fms::variate {
 
-	// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
-	template<class X>
-	inline constexpr X Hermite(unsigned n, X x)
-	{
-		if (n == 0) {
-			return X(1);
-		}
-		if (n == 1) {
-			return x;
-		}
-
-		return x * Hermite(n - 1, x) - X(n - 1) * Hermite(n - 2, x);
-	}
-
-
 	// Normal mean 0 variance 1
 	template<class X = double, class S = X>
-	class standard_normal
-	{
+	class standard_normal : public base<X,S> {
 #ifndef M_SQRT2
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 #endif
@@ -31,12 +17,7 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
-		/*
-		standard_normal()
-		{ }
-		*/
-
-		static X cdf(X x, S s = 0, unsigned n = 0)
+		X cdf_(X x, S s, size_t n) const override
 		{
 			X x_ = x - s;
 
@@ -51,16 +32,16 @@ namespace fms::variate {
 			}
 
 			// (d/dx)^n phi(x) = (-1)^n phi(x) H_n(x)
-			return phi * Hermite(n - 1, x_) * ((n&1) ? 1 : -1);
+			return phi * fms::polynomial::Hermite(n - 1, x_) * ((n&1) ? 1 : -1);
 		}
 
 		// (d/ds) cdf(x, s, 0)
-		static X edf(S s, X x)
+		X edf_(S s, X x) const override
 		{
-			return -cdf(x, s, 1);
+			return -cdf_(x, s, 1);
 		}
 
-		static S cumulant(S s, unsigned n = 0)
+		S cumulant_(S s, size_t n) const override
 		{
 			if (n == 0) {
 				return s * s / 2;
@@ -75,14 +56,5 @@ namespace fms::variate {
 			return S(0);
 		}
 		
-		/*
-		template<unsigned N>
-		static S cumulant(S s)
-		{
-			epsilon<S,N> s_(s);
-
-			return s_ * s_ / 2;
-		}
-		*/
 	};
 }

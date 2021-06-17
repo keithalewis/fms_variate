@@ -17,7 +17,7 @@ int test_variate(const M& m)
 	return 0;
 }
 int test_variate_constant = test_variate(constant(1.23));
-//int test_variate_normal = test_variate(standard_normal<double>{});
+int test_variate_normal = test_variate(standard_normal<double>{});
 
 /*
 template<variate_concept M>

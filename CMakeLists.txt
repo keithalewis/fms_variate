@@ -17,6 +17,7 @@ add_executable(fms_variate.t)
 target_sources(fms_variate.t
 	PRIVATE
 	fms_variate.t.cpp
-	fms_variate_constant.t.cpp)
+	fms_variate_constant.t.cpp
+	fms_variate_normal.t.cpp)
 
 add_test(NAME fms_variate.t COMMAND fms_variate.t)
