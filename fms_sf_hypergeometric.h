@@ -58,7 +58,7 @@ namespace fms::sf {
 		}
 
 		// square root of machine epsilon
-		static constexpr X sqrt_eps = X(1) / (1ul << (std::numeric_limits<X>::digits / 2));
+		#define sqrt_eps (X(1) / (1ul << (std::numeric_limits<X>::digits / 2)))
 		
 		// policy based convergence
 		std::tuple<X, X, int, int> value(X x, X eps = sqrt_eps, int skip = 40, int terms = 40)

@@ -6,7 +6,6 @@
 #include "fms_variate_normal.h"
 
 using namespace fms::test;
-using namespace fms::polynomial;
 using namespace fms::variate;
 
 template<class X>
@@ -14,6 +13,7 @@ int test_hermite()
 {
 	for (X x : {X(-2), X(-1), X(0), X(0.1), X(1), X(2)})
 	{
+		using fms::variate::Hermite;
 		assert(Hermite(0, x) == 1);
 		assert(Hermite(1, x) == x);
 		assert(Hermite(2, x) == x*x - 1);

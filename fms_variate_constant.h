@@ -8,7 +8,7 @@ namespace fms::variate {
 
 	// constant random variate
 	template<class X, class S = X>
-	class constant : public base<X,S> {
+	class constant : public interface<X,S> {
 		X c;
 	public:
 		typedef X xtype;
@@ -19,7 +19,7 @@ namespace fms::variate {
 		{ }
 
 		// F_s(x) = 1(c <= x) independent of s
-		X cdf_(X x, S s = 0, size_t n = 0) const override
+		X cdf_(X x, S s = 0, unsigned n = 0) const override
 		{
 			if (n == 0) {
 				return X(1) * (c <= x);
@@ -39,8 +39,8 @@ namespace fms::variate {
 			return 0;
 		}
 
-		// κ(s) = cs
-		S cumulant_(S s, size_t n = 0) const override
+		// kappa(s) = cs
+		S cumulant_(S s, unsigned n = 0) const override
 		{
 			if (n == 0) {
 				return c * s;

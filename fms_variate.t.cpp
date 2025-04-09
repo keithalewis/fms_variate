@@ -1,4 +1,4 @@
-// fms_variate.t.cpp - random variates
+﻿// fms_variate.t.cpp - random variates
 #include <cassert>
 #include <limits>
 #include "fms_variate.h"
