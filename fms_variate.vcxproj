@@ -148,7 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fms_variate.t.cpp" />
-    <ClCompile Include="fms_variate_constant.t.cpp" />
     <ClCompile Include="fms_sf_hypergeometric.t.cpp" />
     <ClCompile Include="fms_variate_logistic.t.cpp" />
     <ClCompile Include="fms_variate_normal.t.cpp" />
@@ -162,7 +161,6 @@
     <ClInclude Include="fms_sf_hypergeometric.h" />
     <ClInclude Include="fms_test.h" />
     <ClInclude Include="fms_variate_interface.h" />
-    <ClInclude Include="fms_variate_constant.h" />
     <ClInclude Include="fms_variate_logistic.h" />
     <ClInclude Include="fms_variate_normal.h" />
     <ClInclude Include="fms_variate.h" />

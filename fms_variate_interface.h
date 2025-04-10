@@ -20,9 +20,21 @@ the derivative of the cdf of \(X_s\) with respect to \(s\), called sega.
 		{
 			return cdf_(x, s, n);
 		}
-		X edf(X x, S s) const
+		X pdf(X x, S s) const
 		{
-			return edf_(x, s);
+			return pdf_(x, s);
+		}
+		X mgf(X s) const
+		{
+			return mgf_(s);
+		}
+		X cgf(S s) const
+		{
+			return cgf_(s);
+		}
+		X sdf(X x, S s) const
+		{
+			return sdf_(x, s);
 		}
 		S cumulant(S s, unsigned n) const
 		{
@@ -30,7 +42,10 @@ the derivative of the cdf of \(X_s\) with respect to \(s\), called sega.
 		}
 	private:
 		virtual X cdf_(X x, S s, unsigned n) const = 0;
-		virtual X edf_(X x, S s) const = 0;
+		virtual X pdf_(X x, S s) const = 0;
+		virtual X mgf_(S s) const = 0;
+		virtual X cgf_(S s) const = 0;
+		virtual X sdf_(X x, S s) const = 0;
 		virtual S cumulant_(S s, unsigned n) const = 0;
 	};
 

@@ -48,9 +48,22 @@ namespace fms::variate {
 			// (d/dx)^n phi(x) = (-1)^n phi(x) H_n(x)
 			return phi* Hermite(n - 1, x_)* ((n & 1) ? 1 : -1);
 		}
+		X pdf_(X x, S s) const override
+		{
+			X x_ = x - s;
+			return exp(-x_ * x_ / X(2)) / X(M_SQRT2PI);
+		}
+		X mgf_(S s) const override
+		{
+			return exp(s * s / 2);
+		}
+		X cgf_(S s) const override
+		{
+			return s * s / 2;
+		}
 
 		// (d/ds) cdf(x, s, 0)
-		X edf_(S s, X x) const override
+		X sdf_(S s, X x) const override
 		{
 			return -cdf_(x, s, 1);
 		}
