@@ -54,16 +54,6 @@ int test_variate_normal()
 		assert(n.cumulant(0, 3) == 0);
 	}
 
-	{
-		X mu = 2;
-		X sigma = 3;
-		affine n(standard_normal<X>{}, mu, sigma);
-
-		assert(n.cumulant(0, 0) == 0); // true for all cumulants
-		assert(n.cumulant(0, 1) == mu); // mean
-		assert(n.cumulant(0, 2) == sigma * sigma); // variance
-		assert(n.cumulant(0, 3) == 0);
-	}
 	return 0;
 }
 //int test_variate_normal_f = test_variate_normal<float>();

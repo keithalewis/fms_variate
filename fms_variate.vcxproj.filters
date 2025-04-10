@@ -57,7 +57,7 @@
     <ClInclude Include="fms_sf_hypergeometric.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fms_variate_base.h">
+    <ClInclude Include="fms_variate_interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

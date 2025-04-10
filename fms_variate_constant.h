@@ -2,7 +2,7 @@
 #pragma once
 #include <cmath>
 #include <limits>
-#include "fms_variate_base.h"
+#include "fms_variate_interface.h"
 
 namespace fms::variate {
 

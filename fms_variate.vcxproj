@@ -161,7 +161,7 @@
     <ClInclude Include="fms_ensure.h" />
     <ClInclude Include="fms_sf_hypergeometric.h" />
     <ClInclude Include="fms_test.h" />
-    <ClInclude Include="fms_variate_base.h" />
+    <ClInclude Include="fms_variate_interface.h" />
     <ClInclude Include="fms_variate_constant.h" />
     <ClInclude Include="fms_variate_logistic.h" />
     <ClInclude Include="fms_variate_normal.h" />
