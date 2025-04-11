@@ -13,7 +13,7 @@ namespace fms::variate {
 
 	namespace {
 		// n choose k
-		inline constexpr uint64_t C(uint64_t n, uint64_t k)
+		constexpr uint64_t C(uint64_t n, uint64_t k)
 		{
 			if (n == 0) {
 				return k == 0;
@@ -112,7 +112,7 @@ Where \(B(\alpha,\beta)\) is the beta function.
 
 			return cdf0(a + s, b - s, x, n);
 		}
-		S cumulant(S s, unsigned n = 0) const
+		S cgf(S s, unsigned n = 0) const
 		{
 			ensure(-1 < s and s < 1);
 
@@ -127,7 +127,7 @@ Where \(B(\alpha,\beta)\) is the beta function.
 		}
 
 		// d/ds F_s(a,b;x) = d/ds F(a + s, b - s; x) = F_s(a + s, b - s; x) log u(1 - u)
-		X edf(S s, X x) const
+		X sdf(S s, X x) const
 		{
 			X u = 1 / (1 + exp(-x));
 

@@ -37,14 +37,14 @@ int test_variate_logistic()
 		logistic<X> v;
 
 		X s = 0;
-		auto k0 = v.cumulant(s, 0);
+		auto k0 = v.cgf(s, 0);
 		assert(k0 == 0);
-		auto k1 = v.cumulant(s, 1);
+		auto k1 = v.cgf(s, 1);
 		assert(k1 == 0);
-		auto k2 = v.cumulant(s, 2);
+		auto k2 = v.cgf(s, 2);
 		X a = M_PI * M_PI / 3;
 		assert(k2 == a);
-		auto k3 = v.cumulant(s, 1);
+		auto k3 = v.cgf(s, 1);
 		assert(k3 == 0);
 	}
 	{
@@ -54,7 +54,7 @@ int test_variate_logistic()
 			for (X s : range(-0.5, 0.5, 0.1)) {
 				for (int i : range(2, 5, 1)) {
 					X h = pow(0.1, i);
-					auto f = [n,&v](X s) { return v.cumulant(s, n); };
+					auto f = [n,&v](X s) { return v.cgf(s, n); };
 					X df = diff(f, s, h);
 					check(df, f, s, h);
 				}
@@ -83,8 +83,8 @@ int test_variate_logistic()
 		std::valarray<X> hs = { 0.01, 0.001, 0.0001 };
 
 		for (auto n : { 0, 1, 2, 3 }) {
-			auto f = [n, &v](X s) { return v.cumulant(s, n); };
-			auto df = [n, &v](X s) { return v.cumulant(s, n + 1); };
+			auto f = [n, &v](X s) { return v.cgf(s, n); };
+			auto df = [n, &v](X s) { return v.cgf(s, n + 1); };
 			check(f, df, ss, hs);
 		}
 	}

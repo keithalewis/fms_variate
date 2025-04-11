@@ -20,14 +20,14 @@ int test_variate_constant()
 			assert(c.cdf(1.23, s, 1) == std::numeric_limits<double>::infinity());
 			assert(c.cdf(1.24, s, 1) == 0);
 
-			assert(c.cumulant(s, 0) == 1.23*s);
-			assert(c.cumulant(s, 1) == 1.23);
-			assert(c.cumulant(s, 2) == 0);
-			assert(c.cumulant(s, 3) == 0);
+			assert(c.cgf(s, 0) == 1.23*s);
+			assert(c.cgf(s, 1) == 1.23);
+			assert(c.cgf(s, 2) == 0);
+			assert(c.cgf(s, 3) == 0);
 
-			assert(c.edf(s, 1.22) == 0);
-			assert(c.edf(s, 1.23) == 0);
-			assert(c.edf(s, 1.24) == 0);
+			assert(c.sdf(s, 1.22) == 0);
+			assert(c.sdf(s, 1.23) == 0);
+			assert(c.sdf(s, 1.24) == 0);
 		}
 	}
 

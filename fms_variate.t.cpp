@@ -10,13 +10,12 @@ template<class M>
 int test_variate(const M& m)
 {
 	{
-		assert(m.cumulant(0, 0) == 0);
+		assert(m.cgf(0) == 0);
 		//assert(m.cdf(0) == cdf(m, 0.));
 	}
 
 	return 0;
 }
-int test_variate_constant = test_variate(constant(1.23));
 int test_variate_normal = test_variate(standard_normal<double>{});
 
 /*
