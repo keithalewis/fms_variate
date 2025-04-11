@@ -22,7 +22,7 @@ namespace fms::variate {
 
 	// Normal mean 0 variance 1
 	template<class X = double, class S = X>
-	class standard_normal : public interface<X,S> {
+	class standard_normal : public interface<X, S> {
 #ifndef M_SQRT2
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 #endif
@@ -33,25 +33,26 @@ namespace fms::variate {
 
 		X cdf_(X x, S s) const override
 		{
-
 			return 0.5 * std::erfc(-(x - s) / M_SQRT2);
 		}
 		X pdf_(X x, S s) const override
 		{
-			return std::exp(-(x - s) * (x - s) / 2) / M_SQRT2PI;
+			X x_ = x - s;
+			return exp(-x_ * x_ / X(2)) / X(M_SQRT2PI);
 		}
+		// (d/ds) cdf(x, s, 0)
 		X sdf_(S s, X x) const override
 		{
 			return -cdf_(x, s);
 		}
-		S mgf_(S s) const override
+		X mgf_(S s) const override
 		{
-			return std::exp(cgf_(s));
+			return exp(s * s / 2);
 		}
-		S cgf_(S s) const override
+		X cgf_(S s) const override
 		{
 			return s * s / 2;
 		}
-		
+
 	};
 }

@@ -1,10 +1,10 @@
-﻿// fms_variate.h - Random variates.
+// fms_variate.h - Random variates.
 #pragma once
 #include <cmath>
 
 namespace fms::variate {
 
-	inline const char base_doc[] = R"(
+	inline const char interfac_doc[] = R"(
 A random variable \(X\) is determined by its cumulative distribution function \(F(x) = P(X <= x)\). 
 Its cumulant is \(kappa(s) = \log E[\exp(s X)]\) and its Esscher transform \(X_s\) is defined by 
 \(P(X_s \le x) = P_s(X \le x) = E[1(X \le x) \exp(s X - kappa(s))]\).
@@ -50,4 +50,4 @@ the derivative of the cdf of \(X_s\) with respect to \(s\), called sega.
 		virtual S cgf_(S s) const = 0;
 	};
 
-}
+} // namespace fms::variate
